@@ -1,19 +1,23 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import Cart from "./pages/Cart";
-import { CartProvider } from "./context/CartContext";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Products from "./pages/Products";
+import Dashboard from "./pages/Dashboard";
 
-export default function App() {
+
+<div className="text-red-500 text-4xl">Test Tailwind</div>
+
+function App() {
   return (
-    <CartProvider>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/cart" element={<Cart />} />
-        </Routes>
-      </Router>
-    </CartProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Products />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
+
+export default App;
