@@ -211,4 +211,88 @@ router.post("/login", async (req, res) => {
   }
 });
 
+/* ======================================================
+   RESET PASSWORD
+====================================================== */
+
+// Request reset password
+router.post("/request-reset", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ error: "Email wajib diisi" });
+
+    const [rows] = await db.execute("SELECT id FROM users WHERE email = ?", [email]);
+    if (rows.length === 0) return res.status(404).json({ error: "Email tidak ditemukan" });
+
+    const userId = rows[0].id;
+    const resetToken = crypto.randomBytes(40).toString("hex");
+    const resetTokenExpires = new Date(Date.now() + 3600 * 1000); // 1 jam
+
+    await db.execute(
+      "UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?",
+      [resetToken, resetTokenExpires, userId]
+    );
+
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    // Kirim email reset password
+    await transporter.sendMail({
+      from: `"Lola Cake 🍰" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "🔑 Reset Password Lola Cake",
+      html: `
+        <div style="font-family:Arial,sans-serif;padding:30px;background:#fff4f8;border-radius:12px;border:1px solid #ffd3e3;text-align:center;">
+          <h2 style="color:#ff4f76;">Reset Password</h2>
+          <p>Kami menerima permintaan untuk mereset password akun kamu.</p>
+          <a href="${resetLink}" style="
+            display:inline-block;margin-top:20px;padding:12px 22px;background:#ff4f76;color:white;border-radius:8px;text-decoration:none;font-weight:bold;
+          ">Reset Password</a>
+          <p style="margin-top:15px;color:#777;font-size:14px;">
+            Link hanya berlaku 1 jam. Jika kamu tidak meminta reset, abaikan email ini.
+          </p>
+        </div>
+      `
+    });
+
+    res.json({ message: "Email reset password telah dikirim!" });
+  } catch (err) {
+    console.error("REQUEST RESET ERROR:", err);
+    res.status(500).json({ error: "Terjadi kesalahan server" });
+  }
+});
+
+// Reset password menggunakan token
+router.post("/reset-password/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password) return res.status(400).json({ error: "Password baru wajib diisi" });
+
+    const [rows] = await db.execute(
+      "SELECT id, reset_token_expires FROM users WHERE reset_token = ?",
+      [token]
+    );
+
+    if (rows.length === 0) return res.status(400).json({ error: "Token reset tidak valid" });
+
+    const user = rows[0];
+    if (new Date(user.reset_token_expires) < new Date())
+      return res.status(400).json({ error: "Token reset sudah kadaluarsa" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await db.execute(
+      "UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?",
+      [hashedPassword, user.id]
+    );
+
+    res.json({ message: "Password berhasil direset! Silakan login." });
+  } catch (err) {
+    console.error("RESET PASSWORD ERROR:", err);
+    res.status(500).json({ error: "Terjadi kesalahan server" });
+  }
+});
+
 export default router;

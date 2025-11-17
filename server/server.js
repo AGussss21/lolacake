@@ -4,13 +4,14 @@ import { db } from "./db/connection.js";
 import productsRoutes from "./routes/products.js";
 import authRoutes from "./routes/auth.js";
 import dotenv from "dotenv";
+import testimonialRoutes from "./routes/testimonials.js";
 
 dotenv.config();
 
 const app = express();
 console.log("JWT Secret:", process.env.JWT_SECRET);
 
-
+app.use("/api/testimonials", testimonialRoutes);
 app.use(cors());
 app.use(express.json());
 app.use("/auth", authRoutes);

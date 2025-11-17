@@ -122,3 +122,35 @@ export const sendVerificationEmail = async (email, token) => {
     };
   }
 };
+
+// ================================
+// FUNGSI KIRIM EMAIL RESET PASSWORD
+// ================================
+export const sendResetPasswordEmail = async (email, token) => {
+  try {
+    const link = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+
+    const info = await transporter.sendMail({
+      from: `"Lola Cake 🍰" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "🔑 Reset Password Lola Cake",
+      html: `
+      <div style="font-family: Arial, sans-serif; background:#fff4f8; padding: 30px; border-radius: 12px; max-width: 600px; margin: auto; border: 1px solid #ffd3e3; text-align:center;">
+        <h2 style="color:#ff4f76;">Reset Password</h2>
+        <p>Kami menerima permintaan untuk mereset password akun kamu.</p>
+        <a href="${link}" style="display:inline-block; margin-top:20px; padding:12px 22px; background:#ff4f76; color:white; border-radius:8px; text-decoration:none; font-weight:bold;">
+          Reset Password
+        </a>
+        <p style="margin-top:15px; color:#777; font-size:14px;">
+          Link hanya berlaku 1 jam. Jika kamu tidak meminta reset, abaikan email ini.
+        </p>
+      </div>
+      `,
+    });
+
+    return { success: true, message: "Email reset password berhasil dikirim", info };
+  } catch (error) {
+    console.error("❌ ERROR SEND RESET EMAIL:", error);
+    return { success: false, message: "Gagal mengirim email reset password", error };
+  }
+};
