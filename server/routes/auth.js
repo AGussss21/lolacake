@@ -5,10 +5,19 @@ import crypto from "crypto";
 import { db } from "../db/connection.js";
 import { sendVerificationEmail } from "../utils/sendEmail.js";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 
 dotenv.config();
 
 const router = express.Router();
+// Transporter email
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  }
+});
 
 /* ======================================================
    REGISTER USER + EMAIL VERIFIKASI
@@ -222,16 +231,23 @@ router.post("/request-reset", async (req, res) => {
 
     if (!email) return res.status(400).json({ error: "Email wajib diisi" });
 
-    const [rows] = await db.execute("SELECT id FROM users WHERE email = ?", [email]);
-    if (rows.length === 0) return res.status(404).json({ error: "Email tidak ditemukan" });
+    const [rows] = await db.execute(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    );
 
-    const userId = rows[0].id;
+    if (rows.length === 0)
+      return res.status(400).json({ error: "Email tidak terdaftar!" });
+
+    const user = rows[0];
+
+    // Generate token reset
     const resetToken = crypto.randomBytes(40).toString("hex");
-    const resetTokenExpires = new Date(Date.now() + 3600 * 1000); // 1 jam
+    const expires = new Date(Date.now() + 3600000); // 1 jam
 
     await db.execute(
       "UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?",
-      [resetToken, resetTokenExpires, userId]
+      [resetToken, expires, user.id]
     );
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
@@ -262,27 +278,34 @@ router.post("/request-reset", async (req, res) => {
   }
 });
 
+
 // Reset password menggunakan token
 router.post("/reset-password/:token", async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
 
-    if (!password) return res.status(400).json({ error: "Password baru wajib diisi" });
+    if (!password)
+      return res.status(400).json({ error: "Password baru wajib diisi" });
 
     const [rows] = await db.execute(
       "SELECT id, reset_token_expires FROM users WHERE reset_token = ?",
       [token]
     );
 
-    if (rows.length === 0) return res.status(400).json({ error: "Token reset tidak valid" });
+    if (rows.length === 0)
+      return res.status(400).json({ error: "Token reset tidak valid" });
 
     const user = rows[0];
+
+    // Cek expired token
     if (new Date(user.reset_token_expires) < new Date())
       return res.status(400).json({ error: "Token reset sudah kadaluarsa" });
 
+    // Hash password baru
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Update password & hapus token
     await db.execute(
       "UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?",
       [hashedPassword, user.id]
@@ -294,5 +317,6 @@ router.post("/reset-password/:token", async (req, res) => {
     res.status(500).json({ error: "Terjadi kesalahan server" });
   }
 });
+
 
 export default router;

@@ -1,111 +1,83 @@
-// src/pages/ResetPassword.jsx
+import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function ResetPassword() {
   const { token } = useParams();
-  const navigate = useNavigate();
-
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [message, setMessage] = useState("");
-  const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleReset = async () => {
     setMessage("");
-    setIsError(false);
 
-    if (password !== confirmPassword) {
-      setIsError(true);
-      setMessage("Password dan konfirmasi tidak sama");
-      return;
+    if (!password || !confirm) {
+      return setMessage("Password dan konfirmasi wajib diisi");
     }
 
-    setLoading(true);
+    if (password.length < 6) {
+      return setMessage("Password minimal 6 karakter");
+    }
+
+    if (password !== confirm) {
+      return setMessage("Password dan konfirmasi tidak sama");
+    }
 
     try {
-      const res = await fetch(`http://localhost:5000/auth/reset-password/${token}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
+      setLoading(true);
 
-      const data = await res.json();
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/reset-password/${token}`,
+        { password }
+      );
 
-      if (!res.ok) {
-        setIsError(true);
-        setMessage(data.error || "Terjadi kesalahan server");
-      } else {
-        setIsError(false);
-        setMessage(data.message || "Password berhasil direset!");
-        setPassword("");
-        setConfirmPassword("");
-
-        // Redirect ke login setelah 2 detik
-        setTimeout(() => navigate("/login"), 2000);
-      }
+      setMessage(res.data.message);
     } catch (err) {
-      setIsError(true);
-      setMessage("Terjadi kesalahan server");
-      console.error(err);
+      setMessage(err.response?.data?.error || "Terjadi kesalahan server");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "50px auto", fontFamily: "Arial, sans-serif" }}>
-      <h2 style={{ color: "#ff4f76", textAlign: "center" }}>Reset Password</h2>
-      <p style={{ textAlign: "center", color: "#555" }}>
-        Masukkan password baru Anda.
-      </p>
+    <div style={{ maxWidth: 400, margin: "40px auto", textAlign: "center" }}>
+      <h2>Reset Password</h2>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <input
-          type="password"
-          placeholder="Password baru"
-          value={password}
-          required
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}
-        />
-        <input
-          type="password"
-          placeholder="Konfirmasi password"
-          value={confirmPassword}
-          required
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: "10px",
-            borderRadius: "6px",
-            border: "none",
-            background: "#ff4f76",
-            color: "white",
-            fontWeight: "bold",
-            cursor: loading ? "not-allowed" : "pointer",
-            opacity: loading ? 0.7 : 1,
-          }}
-        >
-          {loading ? "Memproses..." : "Reset Password"}
-        </button>
-      </form>
+      <input
+        type="password"
+        placeholder="Password baru"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        style={{ display: "block", width: "100%", padding: 10, margin: "10px 0" }}
+      />
+
+      <input
+        type="password"
+        placeholder="Konfirmasi password"
+        value={confirm}
+        onChange={(e) => setConfirm(e.target.value)}
+        style={{ display: "block", width: "100%", padding: 10, margin: "10px 0" }}
+      />
+
+      <button
+        onClick={handleReset}
+        disabled={loading}
+        style={{
+          padding: "10px 20px",
+          background: loading ? "#aaa" : "#ff4f76",
+          color: "white",
+          border: "none",
+          borderRadius: 8,
+          cursor: loading ? "not-allowed" : "pointer",
+          marginTop: 10,
+        }}
+      >
+        {loading ? "Memproses..." : "Reset Password"}
+      </button>
 
       {message && (
-        <p
-          style={{
-            marginTop: 15,
-            textAlign: "center",
-            color: isError ? "#d63031" : "#00b894",
-            fontWeight: "bold",
-          }}
-        >
+        <p style={{ marginTop: 20, color: message.includes("berhasil") ? "green" : "red" }}>
           {message}
         </p>
       )}

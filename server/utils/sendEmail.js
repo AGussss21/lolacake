@@ -29,7 +29,7 @@ transporter.verify((error, success) => {
 // ================================
 export const sendVerificationEmail = async (email, token) => {
   try {
-    const link = `${process.env.BASE_URL}/auth/verify/${token}`;
+    const link = `${process.env.BASE_URL}/api/auth/verify/${token}`;
 
     const info = await transporter.sendMail({
       from: `"Lola Cake 🍰" <${process.env.EMAIL_USER}>`,
