@@ -35,7 +35,7 @@ const upload = multer({
 router.get("/", verifyToken, async (req, res) => {
   try {
     const [rows] = await db.execute(
-      `SELECT id, full_name, username, email, phone, profile_photo 
+      `SELECT id, fullname, username, email, phone, profile_photo 
        FROM users WHERE id = ? LIMIT 1`,
       [req.user.id]
     );

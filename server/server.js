@@ -6,6 +6,8 @@ import { db } from "./db/connection.js";  // Pastikan koneksi database Anda bena
 import productsRoutes from "./routes/products.js";
 import authRoutes from "./routes/auth.js";
 import testimonialRoutes from "./routes/testimonials.js";
+import profileRoutes from "./routes/profile.js";
+
 
 dotenv.config();
 
@@ -76,6 +78,7 @@ app.get("/api/users/me", authenticateToken, (req, res) => {
 app.use("/api/products", productsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/testimonials", testimonialRoutes);
+app.use("/api/profile", profileRoutes);
 
 // Health check
 app.get("/api", (req, res) => {
