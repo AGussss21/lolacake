@@ -1,5 +1,5 @@
 import express from "express";
-import { db } from "../db/connection.js"; // Sesuaikan path database kamu
+import { db } from "../db/connection.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
