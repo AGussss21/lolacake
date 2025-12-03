@@ -9,8 +9,6 @@ const router = express.Router();
 // ==========================================
 router.get("/", verifyToken, async (req, res) => {
   try {
-    // Kita ambil data keranjang + data detail produknya (Nama, Harga, Gambar)
-    // menggunakan JOIN ke tabel products.
     const query = `
       SELECT 
         c.id AS cart_id,
@@ -25,8 +23,6 @@ router.get("/", verifyToken, async (req, res) => {
     `;
 
     const [items] = await db.query(query, [req.user.id]);
-
-    // Hitung total harga belanjaan (Optional, biar frontend enak)
     const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     res.json({
@@ -52,20 +48,17 @@ router.post("/", verifyToken, async (req, res) => {
   }
 
   try {
-    // Cek dulu: Barang ini udah ada di keranjang user belum?
     const [existing] = await db.query(
       "SELECT id FROM carts WHERE user_id = ? AND product_id = ?",
       [userId, product_id]
     );
 
     if (existing.length > 0) {
-      // SKENARIO A: Barang sudah ada -> Update jumlahnya (tambah qty)
       await db.query(
         "UPDATE carts SET quantity = quantity + ? WHERE user_id = ? AND product_id = ?",
         [quantity || 1, userId, product_id]
       );
     } else {
-      // SKENARIO B: Barang belum ada -> Masukkan barang baru
       await db.query(
         "INSERT INTO carts (user_id, product_id, quantity) VALUES (?, ?, ?)",
         [userId, product_id, quantity || 1]
@@ -88,7 +81,6 @@ router.delete("/:cartId", verifyToken, async (req, res) => {
     const { cartId } = req.params;
     const userId = req.user.id;
 
-    // Pastikan yang dihapus adalah punya user yang login (biar gak hapus punya orang lain)
     const [result] = await db.query(
       "DELETE FROM carts WHERE id = ? AND user_id = ?",
       [cartId, userId]
