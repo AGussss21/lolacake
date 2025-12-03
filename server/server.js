@@ -7,7 +7,7 @@ import productsRoutes from "./routes/products.js";
 import authRoutes from "./routes/auth.js";
 import testimonialRoutes from "./routes/testimonials.js";
 import profileRoutes from "./routes/profile.js";
-
+import cartRoutes from "./routes/cart.js";
 
 dotenv.config();
 
@@ -79,6 +79,7 @@ app.use("/api/products", productsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/cart", cartRoutes);
 
 // Health check
 app.get("/api", (req, res) => {
