@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 03, 2025 at 12:36 PM
+-- Generation Time: Dec 03, 2025 at 01:35 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -61,13 +61,6 @@ CREATE TABLE `testimonials` (
   `products_id` int DEFAULT NULL
 ) ;
 
---
--- Dumping data for table `testimonials`
---
-
-INSERT INTO `testimonials` (`id`, `user_id`, `message`, `rating`, `created_at`, `products_id`) VALUES
-(12, 42, 'wowoowowowow!', 5, '2025-12-03 11:37:03', 2);
-
 -- --------------------------------------------------------
 
 --
@@ -76,6 +69,7 @@ INSERT INTO `testimonials` (`id`, `user_id`, `message`, `rating`, `created_at`, 
 
 CREATE TABLE `users` (
   `id` int NOT NULL,
+  `fullname` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `username` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `phone` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -85,22 +79,23 @@ CREATE TABLE `users` (
   `is_verified` tinyint(1) DEFAULT '0',
   `verification_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `reset_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `reset_token_expires` datetime DEFAULT NULL
+  `reset_token_expires` datetime DEFAULT NULL,
+  `profile_photo` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `phone`, `password`, `role`, `created_at`, `is_verified`, `verification_token`, `reset_token`, `reset_token_expires`) VALUES
-(5, 'agus2', 'agus2@example.com', NULL, '$2b$10$/uSc31RF.JgjMxpKuPIeBeB6DSbkB8Mpc1t6BKhE3sjQ41s/0d3ZC', 'customer', '2025-11-11 03:08:20', 0, NULL, NULL, NULL),
-(9, 'admin', 'admin@example.com', NULL, '$2b$10$NWflZxeOUrViCg6tuBc1nezbE0zFzpSwrcg18WIMK/3Y9OYkGFTtu', 'admin', '2025-11-11 03:57:30', 0, NULL, NULL, NULL),
-(10, 'agus', 'agus3@example.com', NULL, '$2b$10$qrMaP3uQy/fP4tysNuwdPeYNlt8/QEs9soAvzUajNfP/tfIEWbDea', 'customer', '2025-11-12 16:34:07', 0, '1052467c116ebc48a787b89531edd968014654f6ae45c892b2121a93fc97ae91', NULL, NULL),
-(11, 'agus', 'agus.22153@mhs.unesa.ac.id', NULL, '$2b$10$1kNhjAhn3eFSMHjFC/Td0.5FCXN/23R2dJQjYxgOMbP0CbLMED.02', 'customer', '2025-11-12 16:34:43', 0, '13efc664fba5a11638f7f701fc31edc32f891800acdb911d15ad5a969d7262c4', NULL, NULL),
-(39, 'noren', 'noren4039@gmail.com', NULL, '$2b$10$zpgc5iCliH2UrapktVsw9.AjbQ27tQccIgm9brWyHF./U7aPB.CdK', 'customer', '2025-11-17 16:31:05', 1, NULL, '70c27417b9816977a013498b025b66e29a13817706e9a5fa816fcaf84282eccaf5ebecbca94533ff', '2025-11-18 02:17:13'),
-(40, 'ara', 'mutiaranurzarima@gmail.com', NULL, '$2b$10$Q.LtTXQRPZKb0Kipt7cvTOp0sZSr.m3G1qwDL0koOG7qz44p91Yha', 'customer', '2025-12-02 19:04:15', 1, NULL, NULL, NULL),
-(42, 'ara2', 'aracannss@gmail.com', '081231930522', '$2b$10$ceNmuNtlkalah2VqlGYnhOMYcBgbh23ym2YnzXJwjKQrQSsXUvTZ6', 'customer', '2025-12-03 11:02:11', 1, NULL, NULL, NULL),
-(43, 'superadmin', 'admin@lolacake.com', NULL, '$2b$10$6eQSCuYus74e9lUNXGbJvetSubRQH.OBb78p/7VMgnSpxFeg8yM5W', 'admin', '2025-12-03 11:54:08', 1, NULL, NULL, NULL);
+INSERT INTO `users` (`id`, `fullname`, `username`, `email`, `phone`, `password`, `role`, `created_at`, `is_verified`, `verification_token`, `reset_token`, `reset_token_expires`, `profile_photo`) VALUES
+(5, '', 'agus2', 'agus2@example.com', NULL, '$2b$10$/uSc31RF.JgjMxpKuPIeBeB6DSbkB8Mpc1t6BKhE3sjQ41s/0d3ZC', 'customer', '2025-11-11 03:08:20', 0, NULL, NULL, NULL, NULL),
+(9, '', 'admin', 'admin@example.com', NULL, '$2b$10$NWflZxeOUrViCg6tuBc1nezbE0zFzpSwrcg18WIMK/3Y9OYkGFTtu', 'admin', '2025-11-11 03:57:30', 0, NULL, NULL, NULL, NULL),
+(10, '', 'agus', 'agus3@example.com', NULL, '$2b$10$qrMaP3uQy/fP4tysNuwdPeYNlt8/QEs9soAvzUajNfP/tfIEWbDea', 'customer', '2025-11-12 16:34:07', 0, '1052467c116ebc48a787b89531edd968014654f6ae45c892b2121a93fc97ae91', NULL, NULL, NULL),
+(11, '', 'agus', 'agus.22153@mhs.unesa.ac.id', NULL, '$2b$10$1kNhjAhn3eFSMHjFC/Td0.5FCXN/23R2dJQjYxgOMbP0CbLMED.02', 'customer', '2025-11-12 16:34:43', 0, '13efc664fba5a11638f7f701fc31edc32f891800acdb911d15ad5a969d7262c4', NULL, NULL, NULL),
+(39, '', 'noren', 'noren4039@gmail.com', NULL, '$2b$10$zpgc5iCliH2UrapktVsw9.AjbQ27tQccIgm9brWyHF./U7aPB.CdK', 'customer', '2025-11-17 16:31:05', 1, NULL, '70c27417b9816977a013498b025b66e29a13817706e9a5fa816fcaf84282eccaf5ebecbca94533ff', '2025-11-18 02:17:13', NULL),
+(40, '', 'ara', 'mutiaranurzarima@gmail.com', NULL, '$2b$10$Q.LtTXQRPZKb0Kipt7cvTOp0sZSr.m3G1qwDL0koOG7qz44p91Yha', 'customer', '2025-12-02 19:04:15', 1, NULL, NULL, NULL, NULL),
+(43, '', 'superadmin', 'admin@lolacake.com', NULL, '$2b$10$6eQSCuYus74e9lUNXGbJvetSubRQH.OBb78p/7VMgnSpxFeg8yM5W', 'admin', '2025-12-03 11:54:08', 1, NULL, NULL, NULL, NULL),
+(44, 'mutiara', 'ara2', 'aracannss@gmail.com', '081231930522', '$2b$10$TtxBeZmObYdRoWR6eeAzVOiH7Cwf70BC3ByCi47qo22XwBQAX6Nta', 'customer', '2025-12-03 13:03:41', 1, NULL, NULL, NULL, '/uploads/profile/user_44.jpeg');
 
 --
 -- Indexes for dumped tables
@@ -147,7 +142,7 @@ ALTER TABLE `testimonials`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- Constraints for dumped tables
