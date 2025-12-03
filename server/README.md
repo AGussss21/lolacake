@@ -1,7 +1,5 @@
 # Dokumentasi API - Server
 
-> Dokumentasi singkat API untuk folder `server/routes` (Bahasa Indonesia).
-
 Base route asumsi: file route di-mount sesuai nama filenya, mis. `/auth`, `/products`, `/profile`, `/testimonials`.
 
 **Environment Variables**:
@@ -44,7 +42,7 @@ Base route asumsi: file route di-mount sesuai nama filenya, mis. `/auth`, `/prod
   - Response: pesan sukses jika token valid dan belum kedaluwarsa.
 
 - **POST** `/auth/register-admin`
-  - Deskripsi: Membuat akun admin langsung (tanpa verifikasi). Biasanya digunakan satu kali oleh admin.
+  - Deskripsi: Membuat akun admin langsung (tanpa verifikasi).
   - Body (JSON): `{ "username": "", "email": "", "password": "" }`
 
 ---
@@ -113,17 +111,17 @@ Base route asumsi: file route di-mount sesuai nama filenya, mis. `/auth`, `/prod
 
 - Login (dapatkan token):
 ```
-curl -X POST "http://localhost:PORT/auth/login" -H "Content-Type: application/json" -d '{"email":"user@example.com","password":"secret"}'
+POST "http://localhost:PORT/api/auth/login" -H "Content-Type: application/json" -d '{"email":"user@example.com","password":"secret"}'
 ```
 
 - Ambil daftar produk (publik):
 ```
-curl "http://localhost:PORT/products"
+"http://localhost:PORT/api/products"
 ```
 
 - Tambah produk (admin):
 ```
-curl -X POST "http://localhost:PORT/products/add" \
+POST "http://localhost:PORT/api/products/add" \
   -H "Authorization: Bearer <TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{"name":"Kue Coklat","description":"Enak","price":50000,"image":"/images/kue.jpg"}'
@@ -131,17 +129,9 @@ curl -X POST "http://localhost:PORT/products/add" \
 
 - Upload foto profile (multipart):
 ```
-curl -X PUT "http://localhost:PORT/profile/photo" \
+PUT "http://localhost:PORT/api/profile/photo" \
   -H "Authorization: Bearer <TOKEN>" \
   -F "photo=@/path/to/photo.jpg"
 ```
 
 ---
-
-## Tips & Troubleshooting
-- Pastikan `EMAIL_USER` dan `EMAIL_PASS` valid (untuk Gmail, gunakan App Password jika 2FA aktif).
-- Pastikan `FRONTEND_URL` di-set agar link verifikasi / reset mengarah ke frontend yang benar.
-- JWT secret (`JWT_SECRET`) harus kuat dan sama di semua instance aplikasi.
-- Direktori `uploads/profile/` harus dapat ditulis oleh proses server.
-
-Jika Anda mau, saya bisa menambahkan contoh response JSON lengkap atau Postman collection.
